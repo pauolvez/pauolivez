@@ -1,17 +1,15 @@
 import asyncio
 import sys
-from fastapi import FastAPI, Query
+from fastapi import FastAPI
 from app.auth import fastapi_users, auth_backend
 from app.users import UserRead, UserCreate, UserUpdate
 from app.models import User
 from app.database import Base, engine
 
-
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 app = FastAPI()
-
 
 @app.on_event("startup")
 async def on_startup():
@@ -40,8 +38,3 @@ app.include_router(
 @app.get("/")
 def root():
     return {"mensaje": "Backend FastAPI funcionando correctamente con fastapi-users 14"}
-
-@app.get("/buscar-productos")
-async def buscar_productos(query: str = Query(..., min_length=2)):
-    resultados = await buscar_productos_aliexpress(query)
-    return {"resultados": resultados}
