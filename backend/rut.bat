@@ -1,3 +1,3 @@
 @echo off
 call venv\Scripts\activate
-uvicorn app.main:app --reload --port 8001
+uvicorn app.main:app --port 8001
