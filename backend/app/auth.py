@@ -1,6 +1,6 @@
 from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import CookieTransport, AuthenticationBackend, JWTStrategy
-from fastapi_users.db import SQLAlchemyUserDatabase
+from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from app.database import AsyncSessionLocal
 from app.models import User
 from app.users import UserCreate, UserRead, UserUpdate
