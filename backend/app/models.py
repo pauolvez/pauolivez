@@ -1,10 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
-from fastapi_users.db import SQLAlchemyBaseUserTable
 
 class User(SQLAlchemyBaseUserTable[int], Base):
-    id = Column(Integer, primary_key=True)  # 👈 esto es obligatorio
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True)
-    role = Column(String, default="vendedor", nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    role: Mapped[str] = mapped_column(String(length=20), default="vendedor")

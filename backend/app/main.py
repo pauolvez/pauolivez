@@ -1,16 +1,38 @@
 from fastapi import FastAPI
-from app.auth import auth_router, register_router
+from app.auth import fastapi_users, auth_backend
+from app.users import UserRead, UserCreate, UserUpdate
+from app.models import User
 from app.database import Base, engine
 
 app = FastAPI()
 
-# Crear las tablas automáticamente
-Base.metadata.create_all(bind=engine)
+
+@app.on_event("startup")
+async def on_startup():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
 
 # Rutas de autenticación
-app.include_router(auth_router, prefix="/auth/jwt", tags=["auth"])
-app.include_router(register_router, prefix="/auth", tags=["auth"])
+app.include_router(
+    fastapi_users.get_auth_router(auth_backend),
+    prefix="/auth/jwt",
+    tags=["auth"],
+)
+
+app.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="/auth",
+    tags=["auth"],
+)
+
+app.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
+    prefix="/users",
+    tags=["users"],
+)
+
 
 @app.get("/")
-def home():
-    return {"mensaje": "Backend conectado a base de datos correctamente"}
+def root():
+    return {"mensaje": "Backend FastAPI funcionando correctamente con fastapi-users 14"}

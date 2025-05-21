@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings  # ← esta es la línea correcta
 
 class Settings(BaseSettings):
     database_url: str
