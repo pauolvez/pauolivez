@@ -1,37 +1,32 @@
-import sys
 import json
+import sys
 from scrapegraphai.graphs import SmartScraperGraph
 
-def scrapear_web(url: str, instrucciones: str) -> str:
-    prompt = f"Extrae los datos relevantes de esta web: {instrucciones}"
+def main():
+    if len(sys.argv) < 3:
+        print(json.dumps({"error": "URL e instrucciones requeridas"}))
+        return
+
+    url = sys.argv[1]
+    instrucciones = sys.argv[2]
 
     config = {
         "llm": {
-            "provider": "ollama",
-            "config": {
-                "model": "mistral",
-                "base_url": "http://localhost:11434",
-            },
+            "model": "mistral",
+            "api_base": "http://localhost:11434",
+            "api_key": "ollama",  # requerido pero no se valida
+            "type": "ollama"
         }
     }
 
-    graph = SmartScraperGraph(
-        prompt=prompt,
-        source=url,
-        config=config,
-    )
+    prompt = f"Extrae información útil en formato JSON. Instrucciones: {instrucciones}"
 
-    resultado = graph.run()
-    return resultado
+    try:
+        graph = SmartScraperGraph(prompt=prompt, source=url, config=config)
+        resultado = graph.run()
+        print(json.dumps({"resultado": resultado}))
+    except Exception as e:
+        print(json.dumps({"error": str(e)}))
 
 if __name__ == "__main__":
-    if len(sys.argv) >= 3:
-        url = sys.argv[1]
-        instrucciones = sys.argv[2]
-        try:
-            resultado = scrapear_web(url, instrucciones)
-            print(json.dumps({"resultado": resultado}))
-        except Exception as e:
-            print(json.dumps({"error": str(e)}))
-    else:
-        print(json.dumps({"error": "Faltan argumentos: URL e instrucciones"}))
+    main()
