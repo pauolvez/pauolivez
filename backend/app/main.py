@@ -5,7 +5,6 @@ from app.auth import fastapi_users, auth_backend
 from app.users import UserRead, UserCreate, UserUpdate
 from app.models import User
 from app.database import Base, engine
-from app.scraper import buscar_productos_aliexpress
 
 
 if sys.platform.startswith("win"):
