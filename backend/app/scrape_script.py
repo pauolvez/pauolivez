@@ -14,7 +14,7 @@ def main():
         "llm": {
             "model": "mistral",
             "api_base": "http://localhost:11434",
-            "api_key": "ollama",  # requerido pero no se valida
+            "api_key": "ollama",
             "type": "ollama"
         }
     }
@@ -24,9 +24,15 @@ def main():
     try:
         graph = SmartScraperGraph(prompt=prompt, source=url, config=config)
         resultado = graph.run()
-        print(json.dumps({"resultado": resultado}))
+
+        # 🚫 Evita impresiones extras y solo devuelve JSON
+        json_output = json.dumps({"resultado": resultado})
+        sys.stdout.write(json_output)
+        sys.stdout.flush()
     except Exception as e:
-        print(json.dumps({"error": str(e)}))
+        error_output = json.dumps({"error": str(e)})
+        sys.stdout.write(error_output)
+        sys.stdout.flush()
 
 if __name__ == "__main__":
     main()
