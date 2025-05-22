@@ -20,7 +20,7 @@ def main():
         }
     }
 
-    prompt = f"Extrae información útil en formato JSON. Instrucciones: {instrucciones}"
+    prompt = ( f"Devuelve los datos en formato JSON válido, sin explicaciones, sin comentarios y sin texto adicional. " f"Tu salida debe comenzar y terminar con llaves. {instrucciones}")
 
     try:
         graph = SmartScraperGraph(prompt=prompt, source=url, config=config)

@@ -1,16 +1,25 @@
-from app.wrapper_scraper import ejecutar_scrape_externo
+import subprocess
+import json
 
-async def ejecutar_scraping_web(url: str, instrucciones: str) -> dict:
-    """
-    Ejecuta el scraping llamando a un script externo usando subprocess,
-    lo que permite evitar los errores de asyncio y playwright en Windows.
-    """
+def ejecutar_scrape_externo(url: str, instrucciones: str) -> dict:
+    result = subprocess.run(
+        ["venv\\Scripts\\python.exe", "app/scrape_script.py", url, instrucciones],
+        capture_output=True,
+        text=True
+    )
 
-    resultado = ejecutar_scrape_externo(url, instrucciones)
+    stdout = result.stdout.strip()
 
-    # Si el resultado ya es un diccionario válido, lo retornamos.
-    if isinstance(resultado, dict):
-        return {"resultado": resultado}
-    else:
-        # Si hubo algún error inesperado
-        return {"resultado": {"error": "Respuesta inesperada del script externo"}}
+    # Busca el primer carácter válido JSON
+    json_start = stdout.find("{")
+    if json_start == -1:
+        return {"error": "No se encontró contenido JSON válido.", "raw_stdout": stdout}
+
+    try:
+        cleaned = stdout[json_start:]
+        return json.loads(cleaned)
+    except json.JSONDecodeError as e:
+        return {
+            "error": f"Error al parsear JSON: {str(e)}",
+            "raw_stdout": cleaned
+        }

@@ -1,12 +1,13 @@
 import asyncio
 import sys
+import subprocess
 from fastapi import FastAPI, Query
 from app.auth import fastapi_users, auth_backend
 from app.users import UserRead, UserCreate, UserUpdate
 from app.models import User
 from app.database import Base, engine
 from app.ollama_client import query_ollama
-from app.scraper import ejecutar_scraping_web
+from app.wrapper_scraper import ejecutar_scrape_externo
 from concurrent.futures import ThreadPoolExecutor
 
 # Fix para Windows
@@ -42,10 +43,18 @@ async def preguntar_ia(pregunta: str = Query(..., min_length=3)):
     return {"respuesta": respuesta}
 
 @app.get("/scrap-web")
-async def scrap_web(url: str = Query(..., min_length=10), instrucciones: str = Query(..., min_length=5)):
-    resultado = await ejecutar_scraping_web(url, instrucciones)
-    
-    # Evita el anidamiento triple si ya viene como {"resultado": {...}}
-    if isinstance(resultado, dict) and "resultado" in resultado and isinstance(resultado["resultado"], dict):
-        return resultado["resultado"]
-    return resultado
+async def scrap_web(
+    url: str = Query(..., min_length=10),
+    instrucciones: str = Query(..., min_length=5)
+):
+    resultado = ejecutar_scrape_externo(url, instrucciones)
+    return {"resultado": resultado}
+
+@app.get("/scrap-externo")
+async def scrap_externo(url: str = Query(...), instrucciones: str = Query(...)):
+    result = subprocess.run(
+        ["python", "app/wrapper_scraper.py", url, instrucciones],
+        capture_output=True,
+        text=True
+    )
+    return {"salida": result.stdout.strip()}
