@@ -1,3 +1,4 @@
+# wrapper_scraper.py
 import subprocess
 import sys
 import json
@@ -19,9 +20,11 @@ def ejecutar_scrape_externo(url: str, instrucciones: str) -> dict:
                 "stdout": result.stdout.strip()
             }
 
-        # 🧹 Extra: limpiar logs previos si hubiera
         last_line = result.stdout.strip().splitlines()[-1]
-        return json.loads(last_line)
+        resultado_json = json.loads(last_line)
+
+        # ✅ Solo aquí se devuelve con "resultado"
+        return {"resultado": resultado_json}
 
     except Exception as e:
         return {"error": str(e)}

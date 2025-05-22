@@ -1,3 +1,4 @@
+# scrape_script.py
 import json
 import sys
 from scrapegraphai.graphs import SmartScraperGraph
@@ -25,13 +26,11 @@ def main():
         graph = SmartScraperGraph(prompt=prompt, source=url, config=config)
         resultado = graph.run()
 
-        # 🚫 Evita impresiones extras y solo devuelve JSON
-        json_output = json.dumps({"resultado": resultado})
-        sys.stdout.write(json_output)
+        # ✅ Devuelve el resultado directamente, sin anidarlo en "resultado"
+        sys.stdout.write(json.dumps(resultado))
         sys.stdout.flush()
     except Exception as e:
-        error_output = json.dumps({"error": str(e)})
-        sys.stdout.write(error_output)
+        sys.stdout.write(json.dumps({"error": str(e)}))
         sys.stdout.flush()
 
 if __name__ == "__main__":
