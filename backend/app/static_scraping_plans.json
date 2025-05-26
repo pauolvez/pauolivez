@@ -71,6 +71,7 @@
         "click_mas": "span[aria-label='Página siguiente']",
         "apartados": [".product-card"],
         "urls": [
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c",
             "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=24",
             "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=48",
             "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=72",
