@@ -117,6 +117,7 @@ def extraer_con_playwright(plan):
         for pagina in plan.get("urls", []):
             print(f"[PLAYWRIGHT] Visitando {pagina}")
             page.goto(pagina, timeout=60000)
+            print(f"[PLAYWRIGHT] URL actual: {page.url}")
             print("[PLAYWRIGHT] Esperando a que la página cargue completamente...")
             try:
                 boton_cookies = page.query_selector("button#onetrust-accept-btn-handler")
@@ -179,19 +180,23 @@ def extraer_con_playwright(plan):
                                 break
                         except:
                             continue
-
                 if next_button:
+                    old_url = page.url
                     print("[PLAYWRIGHT] Clic en botón siguiente...")
                     try:
-                        next_button.click()
-                        time.sleep(2.5)
-                    except:
-                        print("[PLAYWRIGHT] Error al hacer clic en el botón. Saliendo del bucle.")
+                         next_button.click()
+                        for _ in range(10):  # espera activa max 5 segundos
+                        time.sleep(0.5)
+                        new_url = page.url
+                        if new_url != old_url:
+                          break
+                        else:
+                            print("[PLAYWRIGHT] La URL no ha cambiado tras esperar. Finalizando bucle.")
+                            break
+                         print(f"[PLAYWRIGHT] Nueva URL tras clic: {new_url}")
+                    except Exception as e:
+                        print(f"[PLAYWRIGHT] Error al hacer clic en el botón: {e}")
                         break
-                else:
-                    print("[PLAYWRIGHT] No hay más botones de paginación. Avanzando a la siguiente URL.")
-                    break
-
         browser.close()
     return productos
 
