@@ -1,4 +1,4 @@
-import json, sys, time, requests
+import json, sys, time, requests, os
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -6,9 +6,24 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium_stealth import stealth
 from bs4 import BeautifulSoup
 import cloudscraper
+from urllib.parse import urlparse
 from scraper_graph import ejecutar_scraping_web
 from flaresolverr_manager import start_flaresolverr
+from playwright.sync_api import sync_playwright
 
+STATIC_PLAN_PATH = os.path.join(os.path.dirname(__file__), "static_scraping_plans.json")
+
+def cargar_plan_estatico(url):
+    try:
+        dominio = urlparse(url).netloc.replace("www.", "")
+        with open(STATIC_PLAN_PATH, "r", encoding="utf-8") as f:
+            planes = json.load(f)
+        if dominio in planes:
+            print(f"[SCRAPER] Planificación estática encontrada para: {dominio}")
+            return planes[dominio]
+    except Exception as e:
+        print(f"[SCRAPER] Error al cargar planificación estática: {e}")
+    return None
 
 def obtener_html_cloudscraper(url):
     print("[SCRAPER] Intentando obtener HTML con Cloudscraper...")
@@ -24,7 +39,6 @@ def obtener_html_cloudscraper(url):
     except Exception as e:
         print(f"[SCRAPER] Error con Cloudscraper: {e}")
         return None
-
 
 def obtener_html_tor(url):
     print("[SCRAPER] Intentando obtener HTML vía Tor...")
@@ -44,7 +58,6 @@ def obtener_html_tor(url):
         print(f"[SCRAPER] Error usando Tor: {e}")
         return None
 
-
 def obtener_selectores_y_plan_con_html(url: str, html: str) -> dict:
     prompt_system = (
         "Eres un extractor experto de selectores de scraping web en formato CSS. "
@@ -53,15 +66,15 @@ def obtener_selectores_y_plan_con_html(url: str, html: str) -> dict:
         "No pongas 'scroll', 'click_mas' ni 'apartados' dentro de 'selectores'."
     )
     prompt_user = f"""
-Analiza esta página {url} y responde solo con el JSON siguiente:
-{{
-  "selectores": {{"nombre": "...", "precio": "...", "disponibilidad": "..."}},
+    Analiza esta página {url} y responde solo con el JSON siguiente:
+    {{
+    "selectores": {{"nombre": "...", "precio": "...", "disponibilidad": "..."}},
   "scroll": true/false,
-  "click_mas": "...",
-  "apartados": ["...", "..."]
-}}
-Devuélvelo sin explicaciones, solo el JSON.
-HTML:
+  "     click_mas": "...",
+  " apartados": ["...", "..."]
+}}  
+        Devuélvelo sin explicaciones, solo el JSON.
+    HTML:
 {html[:6000]}
 """
     try:
@@ -95,80 +108,104 @@ HTML:
         print(f"[ERROR] Fallo al obtener planificación de la IA: {e}")
         return {}
 
-
-def extraer_productos_en_pagina(driver, plan):
+def extraer_con_playwright(plan):
     productos = []
-    contenedores = driver.find_elements(By.CSS_SELECTOR, plan["apartados"][0])
-    print(f"[LOG] Contenedores detectados: {len(contenedores)}")
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False, slow_mo=100)
+        page = browser.new_page()
 
-    for cont in contenedores:
-        try:
-            nombre = cont.find_element(By.CSS_SELECTOR, plan["selectores"]["nombre"]).text.strip()
-        except:
-            nombre = "Desconocido"
-        try:
-            precio = cont.find_element(By.CSS_SELECTOR, plan["selectores"]["precio"]).text.strip()
-        except:
-            precio = "No disponible"
-        try:
-            disponibilidad = cont.find_element(By.CSS_SELECTOR, plan["selectores"]["disponibilidad"]).text.strip()
-        except:
-            disponibilidad = "Desconocida"
+        for pagina in plan.get("urls", []):
+            print(f"[PLAYWRIGHT] Visitando {pagina}")
+            page.goto(pagina, timeout=60000)
+            print("[PLAYWRIGHT] Esperando a que la página cargue completamente...")
+            try:
+                boton_cookies = page.query_selector("button#onetrust-accept-btn-handler")
+                if boton_cookies:
+                     print("[PLAYWRIGHT] Aceptando cookies...")
+                     boton_cookies.click()
+                     time.sleep(2)
+            except Exception as e:
+                        print(f"[PLAYWRIGHT] No se pudo aceptar cookies: {e}")
+            try:
+                page.wait_for_load_state("domcontentloaded", timeout=15000)
+            except:
+                print("[PLAYWRIGHT] Timeout esperando DOMContentLoaded, continuando...")
+                time.sleep(3)
 
-        productos.append({
-            "nombre": nombre,
-            "precio": precio,
-            "disponibilidad": disponibilidad
-        })
-    return productos
+            if plan.get("scroll"):
+                for _ in range(5):
+                    page.mouse.wheel(0, 10000)
+                    time.sleep(1.5)
 
-
-def navegar_y_extraer(driver, url, plan):
-    productos = []
-    secciones_visitadas = set()
-
-    def procesar():
-        if plan.get("scroll"):
-            for _ in range(5):
-                driver.execute_script("window.scrollBy(0, document.body.scrollHeight);")
-                time.sleep(1)
-
-        if plan.get("click_mas"):
             while True:
-                try:
-                    btn = WebDriverWait(driver, 3).until(
-                        EC.element_to_be_clickable((By.CSS_SELECTOR, plan["click_mas"]))
-                    )
-                    driver.execute_script("arguments[0].click();", btn)
-                    print("[SCRAPER] Click en botón 'más'")
-                    time.sleep(2)
-                except:
+                items = page.query_selector_all(plan["apartados"][0])
+                print(f"[PLAYWRIGHT] Contenedores detectados: {len(items)}")
+                for item in items:
+                    try:
+                        nombre = item.query_selector(plan["selectores"]["nombre"]).inner_text().strip()
+                    except:
+                        nombre = "Desconocido"
+                    try:
+                        precio = item.query_selector(plan["selectores"]["precio"]).inner_text().strip()
+                    except:
+                        precio = "No disponible"
+                    try:
+                        disponibilidad = item.query_selector(plan["selectores"]["disponibilidad"]).inner_text().strip()
+                    except:
+                        disponibilidad = "Desconocida"
+
+                    productos.append({
+                        "nombre": nombre,
+                        "precio": precio,
+                        "disponibilidad": disponibilidad
+                    })
+
+                # Manejo de click_mas: selector definido o autodetectar
+                click_selector = plan.get("click_mas")
+                next_button = None
+
+                if click_selector:
+                    try:
+                        next_button = page.query_selector(click_selector)
+                    except:
+                        pass
+                else:
+                    # Detección automática: buscar botones comunes
+                    for texto in ["Cargar más", "Ver más", "Mostrar más", "Siguiente"]:
+                        try:
+                            next_button = page.query_selector(f'button:has-text("{texto}")')
+                            if next_button:
+                                print(f"[PLAYWRIGHT] Botón detectado automáticamente por texto: {texto}")
+                                break
+                        except:
+                            continue
+
+                if next_button:
+                    print("[PLAYWRIGHT] Clic en botón siguiente...")
+                    try:
+                        next_button.click()
+                        time.sleep(2.5)
+                    except:
+                        print("[PLAYWRIGHT] Error al hacer clic en el botón. Saliendo del bucle.")
+                        break
+                else:
+                    print("[PLAYWRIGHT] No hay más botones de paginación. Avanzando a la siguiente URL.")
                     break
 
-        productos.extend(extraer_productos_en_pagina(driver, plan))
-
-    print(f"[SCRAPER] Navegando sección principal: {url}")
-    driver.get(url)
-    time.sleep(3)
-    procesar()
-
-    for selector in plan["apartados"]:
-        enlaces = driver.find_elements(By.CSS_SELECTOR, selector)
-        for a in enlaces:
-            try:
-                href = a.get_attribute("href")
-                if href and href not in secciones_visitadas:
-                    secciones_visitadas.add(href)
-                    print(f"[SCRAPER] Visitando sección: {href}")
-                    driver.get(href)
-                    time.sleep(3)
-                    procesar()
-            except:
-                continue
+        browser.close()
     return productos
 
-
 def ejecutar_scraping(url: str, instrucciones: str):
+    dominio = urlparse(url).netloc.replace("www.", "")
+    plan = cargar_plan_estatico(url)
+
+    if dominio == "carrefour.es":
+        if not plan:
+            return {"error": "No hay plan estático para Carrefour"}
+        print("[SCRAPER] Usando Playwright para Carrefour")
+        productos = extraer_con_playwright(plan)
+        return {"productos": productos, "fuente": "playwright"}
+
     print("[SCRAPER] Iniciando FlareSolverr...")
     flaresolverr_proc = start_flaresolverr()
     print("[SCRAPER] FlareSolverr iniciado.")
@@ -193,7 +230,7 @@ def ejecutar_scraping(url: str, instrucciones: str):
 
         print("[SCRAPER] Abriendo página en navegador UC...")
         driver.get(url)
-        time.sleep(4)
+        time.sleep(50)
 
         html = driver.page_source
         print("[DEBUG] HTML enviado a la IA (recortado):\n", html[:2000])
@@ -202,30 +239,37 @@ def ejecutar_scraping(url: str, instrucciones: str):
             print("[ERROR] Bloqueo detectado en Selenium. Intentando Cloudscraper...")
             html = obtener_html_cloudscraper(url)
             if html:
-                plan = obtener_selectores_y_plan_con_html(url, html)
+                plan = plan or obtener_selectores_y_plan_con_html(url, html)
                 if plan:
-                    return ejecutar_scraping_ligero(html, plan)
+                    return ejecutar_scraping_web(url, instrucciones)
                 else:
                     return {"error": "Cloudscraper no generó plan"}
 
             print("[ERROR] Cloudscraper falló. Probando Tor...")
             html = obtener_html_tor(url)
             if html:
-                plan = obtener_selectores_y_plan_con_html(url, html)
+                plan = plan or obtener_selectores_y_plan_con_html(url, html)
                 if plan:
-                    return ejecutar_scraping_ligero(html, plan)
+                    return ejecutar_scraping_web(url, instrucciones)
                 else:
                     return {"error": "Tor no generó plan"}
 
             print("[ERROR] Todos los métodos fallaron. Usando scraper alternativo.")
             return ejecutar_scraping_web(url, instrucciones)
 
-        plan = obtener_selectores_y_plan_con_html(url, html)
+        plan = plan or obtener_selectores_y_plan_con_html(url, html)
         if not plan or "selectores" not in plan:
             return {"error": "No se pudo obtener planificación de la IA"}
 
-        print("[DEBUG] Plan de la IA:\n", json.dumps(plan, indent=2))
-        productos = navegar_y_extraer(driver, url, plan)
+        print("[DEBUG] Plan de scraping:", json.dumps(plan, indent=2))
+        productos = []
+        urls = plan.get("urls") or [url]
+        for pagina in urls:
+            print(f"[SCRAPER] Visitando página del plan: {pagina}")
+            driver.get(pagina)
+            time.sleep(3)
+            productos.extend(extraer_productos_en_pagina(driver, plan))
+
         print(f"[LOG] Total de productos recopilados: {len(productos)}")
         return {"productos": productos, "fuente": "selenium_uc"}
 
@@ -238,7 +282,6 @@ def ejecutar_scraping(url: str, instrucciones: str):
         if flaresolverr_proc:
             flaresolverr_proc.terminate()
             print("[SCRAPER] FlareSolverr detenido.")
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

@@ -1,0 +1,77 @@
+{
+    "books.toscrape.com": {
+        "selectores": {
+            "nombre": ".product_pod h3 a",
+            "precio": ".price_color",
+            "disponibilidad": ".availability"
+        },
+        "scroll": false,
+        "click_mas": null,
+        "apartados": [".product_pod"],
+        "urls": [
+            "https://books.toscrape.com/catalogue/category/books_1/index.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-2.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-3.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-4.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-5.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-6.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-7.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-8.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-9.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-10.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-11.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-12.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-13.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-14.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-15.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-16.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-17.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-18.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-19.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-20.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-21.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-22.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-23.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-24.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-25.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-26.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-27.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-28.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-29.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-30.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-31.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-32.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-33.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-34.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-35.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-36.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-37.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-38.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-39.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-40.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-41.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-42.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-43.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-44.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-45.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-46.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-47.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-48.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-49.html",
+            "https://books.toscrape.com/catalogue/category/books_1/page-50.html"
+        ]
+    },
+    "carrefour.es": {
+        "selectores": {
+            "nombre": ".product-card__title",
+            "precio": ".prices__price--current",
+            "disponibilidad": ".product-card__title"
+        },
+        "scroll": false,
+        "click_mas": "span[aria-label='Página siguiente']",
+        "apartados": [".product-card"],
+        "urls": [
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c"
+        ]
+    }
+}
