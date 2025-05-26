@@ -1,3 +1,4 @@
+import random
 import json, sys, time, requests, os
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
@@ -108,6 +109,9 @@ def obtener_selectores_y_plan_con_html(url: str, html: str) -> dict:
         print(f"[ERROR] Fallo al obtener planificación de la IA: {e}")
         return {}
 
+from playwright.sync_api import sync_playwright
+import time
+
 def extraer_con_playwright(plan):
     productos = []
     with sync_playwright() as p:
@@ -117,16 +121,24 @@ def extraer_con_playwright(plan):
         for pagina in plan.get("urls", []):
             print(f"[PLAYWRIGHT] Visitando {pagina}")
             page.goto(pagina, timeout=60000)
+
+            # Espera y scroll inicial para que cargue todo bien
+            time.sleep(2)
+            page.mouse.wheel(0, 3000)
+            time.sleep(2)
+
             print(f"[PLAYWRIGHT] URL actual: {page.url}")
             print("[PLAYWRIGHT] Esperando a que la página cargue completamente...")
+
             try:
                 boton_cookies = page.query_selector("button#onetrust-accept-btn-handler")
                 if boton_cookies:
-                     print("[PLAYWRIGHT] Aceptando cookies...")
-                     boton_cookies.click()
-                     time.sleep(2)
+                    print("[PLAYWRIGHT] Aceptando cookies...")
+                    boton_cookies.click()
+                    time.sleep(2)
             except Exception as e:
-                        print(f"[PLAYWRIGHT] No se pudo aceptar cookies: {e}")
+                print(f"[PLAYWRIGHT] No se pudo aceptar cookies: {e}")
+
             try:
                 page.wait_for_load_state("domcontentloaded", timeout=15000)
             except:
@@ -161,7 +173,6 @@ def extraer_con_playwright(plan):
                         "disponibilidad": disponibilidad
                     })
 
-                # Manejo de click_mas: selector definido o autodetectar
                 click_selector = plan.get("click_mas")
                 next_button = None
 
@@ -171,7 +182,6 @@ def extraer_con_playwright(plan):
                     except:
                         pass
                 else:
-                    # Detección automática: buscar botones comunes
                     for texto in ["Cargar más", "Ver más", "Mostrar más", "Siguiente"]:
                         try:
                             next_button = page.query_selector(f'button:has-text("{texto}")')
@@ -180,23 +190,32 @@ def extraer_con_playwright(plan):
                                 break
                         except:
                             continue
+
                 if next_button:
                     old_url = page.url
                     print("[PLAYWRIGHT] Clic en botón siguiente...")
                     try:
-                         next_button.click()
-                        for _ in range(10):  # espera activa max 5 segundos
-                        time.sleep(0.5)
-                        new_url = page.url
-                        if new_url != old_url:
-                          break
+                        next_button.click()
+                        for _ in range(10):  # espera activa
+                            time.sleep(0.5)
+                            new_url = page.url
+                            if new_url != old_url:
+                                print(f"[PLAYWRIGHT] Nueva URL tras clic: {new_url}")
+                                # Scroll tras cambio de página para forzar carga
+                                time.sleep(2)
+                                page.mouse.wheel(0, 3000)
+                                time.sleep(2)
+                                break
                         else:
                             print("[PLAYWRIGHT] La URL no ha cambiado tras esperar. Finalizando bucle.")
                             break
-                         print(f"[PLAYWRIGHT] Nueva URL tras clic: {new_url}")
                     except Exception as e:
                         print(f"[PLAYWRIGHT] Error al hacer clic en el botón: {e}")
                         break
+                else:
+                    print("[PLAYWRIGHT] No se encontró botón para continuar. Finalizando bucle.")
+                    break
+
         browser.close()
     return productos
 

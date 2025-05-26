@@ -71,7 +71,41 @@
         "click_mas": "span[aria-label='Página siguiente']",
         "apartados": [".product-card"],
         "urls": [
-            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c"
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=24",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=48",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=72",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=96",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=120",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=144",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=168",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=192",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=216",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=240",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=264",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=288",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=312",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=336",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=360",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=384",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=408",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=432",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=456",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=480",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=504",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=528",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=552",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=576",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=600",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=624",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=648",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=672",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=696",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=720",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=744",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=768",
+            "https://www.carrefour.es/electrodomesticos/lavadoras/cat4165460/c?offset=792"         
+
+
         ]
     }
 }
