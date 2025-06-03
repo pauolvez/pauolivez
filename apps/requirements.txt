@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+jose
+passlib[bcrypt]
+httpx
+beautifulsoup4
+playwright
