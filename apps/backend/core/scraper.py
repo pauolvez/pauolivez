@@ -1,4 +1,7 @@
+ eazwwx-codex/generar-estructura-base-backend-con-fastapi
+
 ueft9t-codex/generar-estructura-base-backend-con-fastapi
+
 """Dynamic scraping utilities for sites that allow it."""
 
 from urllib.parse import urljoin
@@ -99,7 +102,8 @@ async def search_and_compare(page_limit: int = 1):
         item["profit_ds"] = item["profit_fba"] - 1.0
         item["estimated_sales"] = 10
     return products
-=======
+eazwwx-codex/generar-estructura-base-backend-con-fastapi
+
 import httpx
 
 async def search_and_compare():
@@ -117,4 +121,5 @@ async def search_and_compare():
             "estimated_sales": 100,
         }
     ]
+main
 main
