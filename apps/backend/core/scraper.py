@@ -1,3 +1,4 @@
+ueft9t-codex/generar-estructura-base-backend-con-fastapi
 """Dynamic scraping utilities for sites that allow it."""
 
 from urllib.parse import urljoin
@@ -98,3 +99,22 @@ async def search_and_compare(page_limit: int = 1):
         item["profit_ds"] = item["profit_fba"] - 1.0
         item["estimated_sales"] = 10
     return products
+=======
+import httpx
+
+async def search_and_compare():
+    # Placeholder scraping logic. Would scrape suppliers and check Amazon SP-API.
+    # Here we just return a mocked list.
+    return [
+        {
+            "name": "Sample Product",
+            "image": "http://example.com/image.jpg",
+            "supplier_price": 10.0,
+            "amazon_price": 15.0,
+            "asin": "B000123",
+            "profit_fba": 3.0,
+            "profit_ds": 2.0,
+            "estimated_sales": 100,
+        }
+    ]
+main
