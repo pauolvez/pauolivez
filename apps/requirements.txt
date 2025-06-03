@@ -2,6 +2,15 @@ fastapi
 uvicorn
 sqlalchemy
 pydantic
+ueft9t-codex/generar-estructura-base-backend-con-fastapi
+python-jose
+passlib[bcrypt]
+httpx
+beautifulsoup4
+playwright
+python-dotenv
+=======
 jose
 passlib[bcrypt]
 httpx
+main
