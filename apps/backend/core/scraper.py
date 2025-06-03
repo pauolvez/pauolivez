@@ -14,7 +14,7 @@ PRICE_RE = re.compile(r"([\$€£]\s*\d+[\d,.]*)")
 
 async def _load_html(page, url: str) -> str:
     """Navigate with Playwright and return rendered HTML."""
-    await page.goto(url)
+    await page.goto(url, wait_until="networkidle")
     return await page.content()
 
 

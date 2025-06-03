@@ -2,8 +2,9 @@ fastapi
 uvicorn
 sqlalchemy
 pydantic
-jose
+python-jose
 passlib[bcrypt]
 httpx
 beautifulsoup4
 playwright
+python-dotenv

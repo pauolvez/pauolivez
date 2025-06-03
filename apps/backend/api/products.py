@@ -15,8 +15,9 @@ async def search_products(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    items = await scraper.search_and_compare(page_limit)
+    """Return example products and optional crawl info."""
+    products = await scraper.search_and_compare(page_limit)
+    result = {"products": products}
     if crawl_depth:
-        crawled = await scraper.crawl_site(scraper.BOOKS_BASE, max_pages=crawl_depth)
-        return {"products": items, "crawled": crawled}
-    return items
+        result["crawled"] = await scraper.crawl_site(scraper.BOOKS_BASE, max_pages=crawl_depth)
+    return result
