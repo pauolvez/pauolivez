@@ -84,12 +84,17 @@ async def detect_prices(url: str):
 
 
 async def search_and_compare(page_limit: int = 1):
-    """Return scraped products with placeholder Amazon data."""
+    """Return scraped products enriched with Amazon price data."""
+    from . import amazon
+
     products = await fetch_books(page_limit)
     for item in products:
-        item["amazon_price"] = round(item["supplier_price"] * 1.5, 2)
-        item["asin"] = ""
-        item["profit_fba"] = item["amazon_price"] - item["supplier_price"]
+        amazon_price, asin = await amazon.get_price_estimate(
+            item["name"], item["supplier_price"]
+        )
+        item["amazon_price"] = amazon_price
+        item["asin"] = asin
+        item["profit_fba"] = amazon_price - item["supplier_price"]
         item["profit_ds"] = item["profit_fba"] - 1.0
         item["estimated_sales"] = 10
     return products

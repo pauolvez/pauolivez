@@ -13,6 +13,10 @@ python -m playwright install
 
 Launch backend and frontend on Windows using `start.bat`.
 
+The first time you run the project it will create a local SQLite database
+(`kingstar.db`). You can adjust connection settings in `backend/settings.py`
+or by defining the `DATABASE_URL` environment variable.
+
 ## Notes
 - The scraper uses Playwright to render pages with JavaScript support and automatically scans the rendered DOM for price values.
 - Only scrape websites that explicitly allow it and comply with their terms of service.
